@@ -1,0 +1,92 @@
+library(ASICS); library(plotly)
+
+#Carregando novos metabolitos na biblioteca (Podem ser baixados no BMRB ou obtidos no laboratorio)
+
+complementary_spectra <- importSpectraBruker("C:/Users/Edmil/Desktop/supplementar library",
+                                             which.spectra = NULL)
+
+#nb.protons deve corresponder ao total de protons detectaveis no RMN
+#Ex: ethanol - tripleto (3 protons) + quarteto (2 protons) = 5
+complementary_library <- createPureLibrary(complementary_spectra,nb.protons = c(5,10))
+
+
+plot(complementary_library)%>%ggplotly()
+
+
+#A biblioteca nova pode ser fundida a biblioteca anterior
+
+complete_library <- c(pure_library, complementary_library)
+
+
+
+#Carregar os espectros processar e rodar a identificacao automatica
+
+spectra <- importSpectraBruker("C:/Bruker/TopSpin3.6.2/examdata/espectros_teste",
+                               which.spectra = NULL)
+
+spectra_norm <- normaliseSpectra(spectra, type.norm = "pqn")
+
+spectra_align <- alignSpectra(spectra_norm)
+
+spectra_obj <- createSpectra(spectra_align)
+
+plotAlignment(spectra_obj)
+
+plot(spectra_obj)%>%ggplotly()
+
+quantification1 <- ASICS(spectra_obj,
+                        joint.align = TRUE,
+                        quantif.method = "both",
+                        max.shift = 0.01,
+                        pure.library = complete_library,
+                        noise.thres = 0.5,
+                        clean.thres = 80,
+                        ncores = 16)
+
+summary(quantification1)
+
+plot(quantification1)%>%ggplotly()
+
+results <- getQuantification(quantification1)
+
+plot(quantification1,add.metab="Lactate")%>%ggplotly()
+
+
+#--------------------------------------------------------------------
+
+quantification2 <- ASICS(spectra_obj,
+                         joint.align = TRUE,
+                         quantif.method = "both",
+                         noise.thres = 0.5,
+                         max.shift = 0.02,
+                         pure.library = complete_library,
+                         clean.thres = 80,
+                         ncores = 16)
+
+summary(quantification2)
+
+plot(quantification2)%>%ggplotly()
+
+results <- getQuantification(quantification2)
+
+plot(quantification2,add.metab="ethanol",pure.library=complete_library)%>%ggplotly()
+
+#-----------------------------------------------------------------------------------
+
+quantification3 <- ASICS(spectra_obj,
+                         joint.align = TRUE,
+                         quantif.method = "both",
+                         noise.thres = 0.3,
+                         max.shift = 0.02,
+                         pure.library = complete_library,
+                         clean.thres = 80,
+                         ncores = 16)
+
+summary(quantification3)
+
+plot(quantification3)%>%ggplotly()
+
+results <- getQuantification(quantification3)
+
+plot(quantification3,add.metab="L-Cysteine",pure.library=complete_library)%>%ggplotly()
+

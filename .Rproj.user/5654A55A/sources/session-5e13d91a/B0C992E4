@@ -1,0 +1,28 @@
+{
+    "id": "B0C992E4",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1748912777265.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "id": "a742f86e550041048fd7dc31efb74494",
+        "name": "quantification3",
+        "title": "quantification3",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 8243105135629133174,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1748912777265,
+    "read_only": false,
+    "read_only_alternatives": []
+}

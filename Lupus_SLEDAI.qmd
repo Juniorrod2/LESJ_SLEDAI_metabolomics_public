@@ -1,0 +1,177 @@
+---
+title: "Lupus_SLEDAI"
+execute: 
+  echo: false
+  warning: false
+format: 
+  html: 
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    fig-width: 12
+    fig-height: 8
+    embed-resources: true
+  pdf: 
+    fig-width: 12
+    fig-height: 8
+editor: visual
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Objetivos
+
+TODO: Descrever os objetivos práticos de analise a serem concluídos.
+
+-   [x] Correlacionar a escala SLEDAI com os metabolitos;
+
+-   [x] Verificar se é possivel identificar diferenças entre as fases ativa e remissão para o LESJ;
+
+# Hipoteses
+
+TODO: Descrever as hipóteses a serem testadas e os resultados das hipóteses já verificadas
+
+Pacientes de LESJ se diferenciam de acordo com o SLEDAI
+
+:   Pouca diferença foi observada na pratica, na maioria das analises os grupos não se separam e apenas um metabolito/sinal (VLDL/LDL) apresentou se correlacionar com o score do SLEDAI.
+
+A mistura entre pacientes em remissão e em fase ativa influência na analise.
+
+:   Retirando os pacientes em remissão foi possivel observar uma pequena melhora na separação, mas nenhum efeito acentuado foi observado, apenas uma ligeira mudança na sobreposição dos grupos.
+
+```{r}
+library(dplyr);library(tidyr);library(ropls);library(rstatix);library(NAPRMN);library(ggpubr)
+
+lupus_metabolomics <- readxl::read_excel("inputs/Metabolomica_plus_dados_gerais.xlsx")
+
+
+```
+
+# Analise inicial entre os grupos
+
+```{r}
+normalized_metabolites <- DataNormalization(lupus_metabolomics[3:18],rowNorm = "Median",scaleNorm = "Pareto")
+
+normalized_metabolites <- cbind(lupus_metabolomics[1:2],normalized_metabolites,lupus_metabolomics[19:40])
+
+PCA_lupus <- opls(normalized_metabolites[3:18])
+
+Plot_scores(PCA_lupus,lupus_metabolomics$Label,ellipse = F)
+
+Plot_loading2(PCA_lupus)
+```
+
+Mesmo na PCA os grupos LESJ e AIJ se separam do controle.
+
+```{r}
+PLS_lupus <- opls(normalized_metabolites[3:18],normalized_metabolites$Label)
+
+Plot_scores(PLS_lupus,labels = normalized_metabolites$Samples)
+Plot_loading2(PLS_lupus)
+```
+
+Apesar da dispersão grande no grupo AIJ o modelo de PLS-DA caracteriza bem os 3 grupos, além de apresentar um modelo robusto com bons parametros de validação.
+
+Para verificar se a inclusão dos pacientes em remissão impacta na analise, no modelo a seguir foi filtrado os pacientes de LESJ em remissão de acordo com o SLEDAI.
+
+```{r}
+
+lupus_wth_remission <- filter(normalized_metabolites,`SLEDAI2K (10 dias antes da coleta)`!=0|is.na(`SLEDAI2K (10 dias antes da coleta)`))
+
+PLS_DA_wth_remission <- opls(lupus_wth_remission[3:18],lupus_wth_remission$Label)
+
+Plot_scores(PLS_DA_wth_remission)
+Plot_loading2(PLS_DA_wth_remission)
+```
+
+Comparando apenas LESJ e AIJ, ainda filtrando para retirar as amostras dos pacientes em remissão para LESJ.
+
+```{r}
+lupus_wth_remission <- filter(normalized_metabolites,`SLEDAI2K (10 dias antes da coleta)`!=0|is.na(`SLEDAI2K (10 dias antes da coleta)`),Label!="Control")
+
+PLS_DA_wth_remission <- opls(lupus_wth_remission[3:18],lupus_wth_remission$Label)
+
+Plot_scores(PLS_DA_wth_remission)
+Plot_loading2(PLS_DA_wth_remission)
+```
+
+Em comparação com as demais analises, remover os pacientes em remissão causa uma ligeira melhora na separação entre o grupo LESJ dos grupos AIJ e control.
+
+# Comparação dos subgrupos com base no SLEDAI
+
+```{r}
+count(lupus_metabolomics,Label,`SLEDAI2K (10 dias antes da coleta)`)%>%knitr::kable()
+```
+
+Há poucos pacientes de LESJ que podem ser classificado como remissão (SLEDAI-2K = 0) em comparação com os pacientes em fase ativa. Por hora, vou usar o criterio do artigo abaixo para tentar balancear melhor os grupos, embora ainda exista apenas uma amostra (SLEDAI=8) que se encaixa no criterio "moderate" que foi realocada para o grupo "severe".
+
+*According to Carter et al., one can divide SLE activity based on SLEDAI-2K into severe (SLEDAI-2K \> 12), moderate (6 \< SLEDAI-2K ≤ 12), mild (0 \< SLEDAI-2K ≤ 6) and remission (SLEDAI-2K = 0)*
+
+[Suszek et al (2024)](https://pmc.ncbi.nlm.nih.gov/articles/PMC11267658/)
+
+```{r}
+lupus_sledai <- filter(normalized_metabolites,Label=="jSLE",!is.na(`SLEDAI2K (10 dias antes da coleta)`))
+
+SLEDAI_category <- cut(lupus_sledai$`SLEDAI2K (10 dias antes da coleta)`,breaks = c(-Inf,0,6,Inf),labels = c("remission","mild","severe"))
+
+lupus_sledai$SLEDAI_group <- SLEDAI_category
+```
+
+Filtrando apenas o grupo LESJ para verificar a distribuição de acordo com o SLEDAI.
+
+```{r}
+
+PCA_sledai <- opls(lupus_sledai[3:18],predI = 8)
+
+Plot_scores(PCA_sledai,lupus_sledai$SLEDAI_group,labels = lupus_sledai$`SLEDAI2K (10 dias antes da coleta)`,ellipse = F)
+
+plot_scores_overview(PCA_sledai,lupus_sledai$SLEDAI_group,labels = lupus_sledai$`SLEDAI2K (10 dias antes da coleta)`)
+
+```
+
+Os grupos em remissão, leve e severo não se separam nem por PCA ou PLS-DA (Modelo não significativo). Testando cada metabolito individualmente, nenhum dos metabolitos apresentou diferença significativa na Anova entre os grupos com base no SLEDAI. Também foi verificado se alguns dos metabolitos apresentaria significancia testando somente os grupos remission e severe, nesse caso apenas a **isoleucina** apresentou significância se desconsiderada a correção por FDR, portanto existe o risco de ser apenas um falso positivo do teste.
+
+```{r}
+univariate_sledai1 <- select(lupus_sledai,Samples,Label,SLEDAI_group,Formate:`VLDL/LDL`)%>%gather(-Samples:-SLEDAI_group,key="metabolite",value="intensity")%>%group_by(metabolite)%>%kruskal_test(intensity~SLEDAI_group)
+
+
+univariate_sledai2<- select(lupus_sledai,Samples,Label,SLEDAI_group,Formate:`VLDL/LDL`)%>%filter(SLEDAI_group!="mild")%>%gather(-Samples:-SLEDAI_group,key="metabolite",value="intensity")%>%group_by(metabolite)%>%wilcox_test(intensity~SLEDAI_group)%>%adjust_pvalue(method = "fdr")
+
+select(lupus_sledai,Samples,Label,SLEDAI_group,Formate:`VLDL/LDL`)%>%gather(-Samples:-SLEDAI_group,key="metabolite",value="intensity")%>%ggboxplot(x="SLEDAI_group",y="intensity",color="SLEDAI_group")+facet_wrap(~metabolite,scales = "free")
+```
+
+Uma possivel variável de confusão aqui é o uso de medicamentos, todos os pacientes de LESJ independente do SLEDAI fazem uso de hidroxicloroquina associada a alguns outros imunosupressores em alguns casos, ficando dificil diferenciar os efeitos do uso do medicamento dos efeitos da condição.
+
+O boxplot mostra um pequeno aumento do VLDL em função dos grupos do SLEDAI, apesar de que não foi observado significancia na diferença entre as média dos grupos, uma correlação significativa foi observada entre **VLDL** e o valor do SLEDAI (r=0.41, p=0.033).
+
+Testando a correlação entre os metabolitos e os parametros SLEDAI
+
+```{r}
+
+library(corrplot)
+
+sledai_correlation <- cor(cbind(lupus_sledai[3:19],lupus_sledai[32]))
+sledai_correlation_pval <- cor.mtest(cbind(lupus_sledai[3:19],lupus_sledai[32]))
+
+
+color_gradient <- colorRampPalette(c("blue","white","red"))
+
+
+corrplot(sledai_correlation,method = "color",col = color_gradient(200),type = "upper",tl.cex = 0.7,p.mat = sledai_correlation_pval$p,insig = "label_sig",sig.level = c(0.001, 0.01, 0.05),pch.cex = 1)
+
+
+```
+
+Além do VLDL nenhum outro metabolito apresentou correlação significativa com os valores de SLEDAI.
+
+```{r}
+library(pheatmap)
+
+pheatmap(lupus_sledai[3:18],
+         scale = "column",
+         labels_row=lupus_sledai$Samples,
+         annotation_row = data.frame("SLEDAI"=lupus_sledai$`SLEDAI2K (10 dias antes da coleta)`,"SLEDAI group"=lupus_sledai$SLEDAI_group),
+         annotation_colors = list("SLEDAI.group"=c(remission="green",mild="orange",severe="red")))
+```
+
+Heatmap mostra niveis relativamente mais altos de VLDL/LDL nos grupos mild e severe, como já observado no boxplot. Além disso, não há um padrão muito claro de agrupamento entre as variáveis em função do SLEDAI. Nota-se, no entanto, que o grupo remission tem as chaves de agrupamento mais distantes do grupo severe, indicando uma maior diferença entre estes dois grupos.
