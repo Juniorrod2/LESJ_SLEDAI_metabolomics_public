@@ -8,12 +8,32 @@ editor: visual
 
 # Descrição do projeto
 
-TODO: Descrever as caracteristicas do projeto e informações analisadas.
+Este projeto investiga o perfil metabolômico de pacientes pediátricos com Lúpus Eritematoso Sistêmico Juvenil (LESJ) em comparação com pacientes com Artrite Idiopática Juvenil (AIJ) e controles saudáveis, utilizando dados de espectroscopia de ressonância magnética nuclear (RMN) de ^1^H. O objetivo central é avaliar se o índice de atividade da doença SLEDAI-2K (Systemic Lupus Erythematosus Disease Activity Index 2000) se correlaciona com alterações no metaboloma sérico dos pacientes, bem como verificar se é possível distinguir as fases ativa e de remissão da doença com base nos perfis metabólicos.
+
+As análises multivariadas — incluindo Análise de Componentes Principais (PCA) e Análise Discriminante por Mínimos Quadrados Parciais (PLS-DA) — demonstram que os grupos LESJ e AIJ se diferenciam do grupo controle. Entretanto, a separação entre os subgrupos de atividade do LESJ (remissão, leve e severo, conforme classificação pelo SLEDAI-2K) é limitada. Entre todos os metabólitos avaliados, apenas o sinal de **VLDL/LDL** apresentou correlação estatisticamente significativa com o escore do SLEDAI-2K (r = 0,41; p = 0,033), sugerindo que alterações no perfil lipídico podem refletir a atividade inflamatória da doença.
+
+Os resultados completos da análise estão disponíveis no arquivo [**Lupus_SLEDAI.pdf**](Lupus_SLEDAI.pdf).
 
 # Descrição dos arquivos do projeto
 
-TODO: Descrever o conteúdo de cada arquivo e pasta existente no projeto
+O projeto está organizado da seguinte forma:
+
+```
+LESJ_SLEDAI_metabolomics_public/
+│
+├── inputs/                                    # Dados de entrada
+│   ├── Metabolomica_plus_dados_gerais.xlsx    # Dados metabolômicos (RMN) integrados com variáveis clínicas e demográficas dos pacientes
+│   └── Sample Metadata.xlsx                   # Metadados das amostras (identificação, grupo, informações de coleta)
+│
+├── Lupus_SLEDAI.qmd                           # Documento Quarto com todo o código R e narrativa da análise
+├── Lupus_SLEDAI.pdf                           # Relatório PDF com os resultados da análise (saída principal)
+├── Lupus_SLEDAI.html                          # Versão HTML interativa do relatório de análise
+├── readme.qmd                                 # Este arquivo — descrição geral do projeto
+└── LESJ_SLEDAI_public.Rproj                   # Arquivo de projeto do RStudio
+```
+
+O código de análise em `Lupus_SLEDAI.qmd` realiza as seguintes etapas: (1) normalização dos dados metabolômicos por mediana com escalonamento Pareto; (2) análises multivariadas PCA e PLS-DA para discriminação entre grupos; (3) classificação dos pacientes de LESJ em subgrupos de atividade (remissão, leve e severo) com base no SLEDAI-2K; (4) testes univariados (Kruskal-Wallis e Mann-Whitney) e análise de correlação entre metabólitos e escore do SLEDAI-2K; e (5) visualizações incluindo heatmap hierárquico e gráficos de correlação.
 
 # Informações sobre as amostras
 
-TODO: Descrever caracteristicas especificas das amostras ou detalhes a serem considerados futuramente.
+O conjunto de dados inclui amostras de soro de três grupos: pacientes com LESJ, pacientes com AIJ e controles saudáveis. Os pacientes com LESJ foram submetidos ao escore SLEDAI-2K, coletado nos 10 dias anteriores à coleta da amostra, permitindo a classificação em remissão (SLEDAI-2K = 0), leve (0 < SLEDAI-2K ≤ 6) e severo (SLEDAI-2K > 6). Todos os pacientes com LESJ faziam uso de hidroxicloroquina, com alguns recebendo imunossupressores adicionais, o que representa uma potencial variável de confusão na interpretação dos perfis metabólicos. O número de pacientes em remissão é reduzido em comparação com os em fase ativa, limitando o poder estatístico para comparações entre subgrupos de atividade.
