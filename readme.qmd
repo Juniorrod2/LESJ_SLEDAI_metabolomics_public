@@ -6,34 +6,34 @@ format:
 editor: visual
 ---
 
-# Descrição do projeto
+# Project description
 
-Este projeto investiga o perfil metabolômico de pacientes pediátricos com Lúpus Eritematoso Sistêmico Juvenil (LESJ) em comparação com pacientes com Artrite Idiopática Juvenil (AIJ) e controles saudáveis, utilizando dados de espectroscopia de ressonância magnética nuclear (RMN) de ^1^H. O objetivo central é avaliar se o índice de atividade da doença SLEDAI-2K (Systemic Lupus Erythematosus Disease Activity Index 2000) se correlaciona com alterações no metaboloma sérico dos pacientes, bem como verificar se é possível distinguir as fases ativa e de remissão da doença com base nos perfis metabólicos.
+This project investigates the metabolomic profile of pediatric patients with Juvenile Systemic Lupus Erythematosus (JSLE) in comparison with patients with Juvenile Idiopathic Arthritis (JIA) and healthy controls, using ^1^H nuclear magnetic resonance (NMR) spectroscopy data. The primary objective is to evaluate whether the SLEDAI-2K (Systemic Lupus Erythematosus Disease Activity Index 2000) disease activity index correlates with alterations in the serum metabolome of patients, as well as to assess whether the active and remission phases of the disease can be distinguished based on metabolic profiles.
 
-As análises multivariadas — incluindo Análise de Componentes Principais (PCA) e Análise Discriminante por Mínimos Quadrados Parciais (PLS-DA) — demonstram que os grupos LESJ e AIJ se diferenciam do grupo controle. Entretanto, a separação entre os subgrupos de atividade do LESJ (remissão, leve e severo, conforme classificação pelo SLEDAI-2K) é limitada. Entre todos os metabólitos avaliados, apenas o sinal de **VLDL/LDL** apresentou correlação estatisticamente significativa com o escore do SLEDAI-2K (r = 0,41; p = 0,033), sugerindo que alterações no perfil lipídico podem refletir a atividade inflamatória da doença.
+Multivariate analyses — including Principal Component Analysis (PCA) and Partial Least Squares Discriminant Analysis (PLS-DA) — demonstrate that the JSLE and JIA groups differ from the control group. However, the separation among JSLE activity subgroups (remission, mild, and severe, as classified by SLEDAI-2K) is limited. Among all metabolites evaluated, only the **VLDL/LDL** signal showed a statistically significant correlation with the SLEDAI-2K score (r = 0.41; p = 0.033), suggesting that alterations in the lipid profile may reflect the inflammatory activity of the disease.
 
-Os resultados completos da análise estão disponíveis no arquivo [**Lupus_SLEDAI.pdf**](Lupus_SLEDAI.pdf).
+The complete results of the analysis are available in the file [**Lupus_SLEDAI.pdf**](Lupus_SLEDAI.pdf).
 
-# Descrição dos arquivos do projeto
+# Project file description
 
-O projeto está organizado da seguinte forma:
+The project is organized as follows:
 
 ```
 LESJ_SLEDAI_metabolomics_public/
 │
-├── inputs/                                    # Dados de entrada
-│   ├── Metabolomica_plus_dados_gerais.xlsx    # Dados metabolômicos (RMN) integrados com variáveis clínicas e demográficas dos pacientes
-│   └── Sample Metadata.xlsx                   # Metadados das amostras (identificação, grupo, informações de coleta)
+├── inputs/                                    # Input data
+│   ├── Metabolomica_plus_dados_gerais.xlsx    # Metabolomic (NMR) data integrated with clinical and demographic patient variables
+│   └── Sample Metadata.xlsx                   # Sample metadata (identification, group, collection information)
 │
-├── Lupus_SLEDAI.qmd                           # Documento Quarto com todo o código R e narrativa da análise
-├── Lupus_SLEDAI.pdf                           # Relatório PDF com os resultados da análise (saída principal)
-├── Lupus_SLEDAI.html                          # Versão HTML interativa do relatório de análise
-├── readme.qmd                                 # Este arquivo — descrição geral do projeto
-└── LESJ_SLEDAI_public.Rproj                   # Arquivo de projeto do RStudio
+├── Lupus_SLEDAI.qmd                           # Quarto document containing all R code and analysis narrative
+├── Lupus_SLEDAI.pdf                           # PDF report with analysis results (primary output)
+├── Lupus_SLEDAI.html                          # Interactive HTML version of the analysis report
+├── readme.qmd                                 # This file — general project description
+└── LESJ_SLEDAI_public.Rproj                   # RStudio project file
 ```
 
-O código de análise em `Lupus_SLEDAI.qmd` realiza as seguintes etapas: (1) normalização dos dados metabolômicos por mediana com escalonamento Pareto; (2) análises multivariadas PCA e PLS-DA para discriminação entre grupos; (3) classificação dos pacientes de LESJ em subgrupos de atividade (remissão, leve e severo) com base no SLEDAI-2K; (4) testes univariados (Kruskal-Wallis e Mann-Whitney) e análise de correlação entre metabólitos e escore do SLEDAI-2K; e (5) visualizações incluindo heatmap hierárquico e gráficos de correlação.
+The analysis code in `Lupus_SLEDAI.qmd` performs the following steps: (1) median normalization of metabolomic data with Pareto scaling; (2) multivariate PCA and PLS-DA analyses for group discrimination; (3) classification of JSLE patients into activity subgroups (remission, mild, and severe) based on SLEDAI-2K; (4) univariate tests (Kruskal-Wallis and Mann-Whitney) and correlation analysis between metabolites and the SLEDAI-2K score; and (5) visualizations including hierarchical heatmap and correlation plots.
 
-# Informações sobre as amostras
+# Sample information
 
-O conjunto de dados inclui amostras de soro de três grupos: pacientes com LESJ, pacientes com AIJ e controles saudáveis. Os pacientes com LESJ foram submetidos ao escore SLEDAI-2K, coletado nos 10 dias anteriores à coleta da amostra, permitindo a classificação em remissão (SLEDAI-2K = 0), leve (0 < SLEDAI-2K ≤ 6) e severo (SLEDAI-2K > 6). Todos os pacientes com LESJ faziam uso de hidroxicloroquina, com alguns recebendo imunossupressores adicionais, o que representa uma potencial variável de confusão na interpretação dos perfis metabólicos. O número de pacientes em remissão é reduzido em comparação com os em fase ativa, limitando o poder estatístico para comparações entre subgrupos de atividade.
+The dataset includes serum samples from three groups: JSLE patients, JIA patients, and healthy controls. JSLE patients underwent SLEDAI-2K scoring, collected within the 10 days prior to sample collection, enabling classification into remission (SLEDAI-2K = 0), mild (0 < SLEDAI-2K ≤ 6), and severe (SLEDAI-2K > 6). All JSLE patients were receiving hydroxychloroquine, with some receiving additional immunosuppressants, which represents a potential confounding variable in the interpretation of metabolic profiles. The number of patients in remission is limited compared to those in the active phase, reducing the statistical power for comparisons among activity subgroups.
