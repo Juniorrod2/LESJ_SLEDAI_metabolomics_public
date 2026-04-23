@@ -6,14 +6,14 @@ format:
 editor: visual
 ---
 
-# Descrição do projeto
+# Project Description
 
-TODO: Descrever as caracteristicas do projeto e informações analisadas.
+TODO: Describe the project characteristics and analyzed information.
 
-# Descrição dos arquivos do projeto
+# Project Files Description
 
-TODO: Descrever o conteúdo de cada arquivo e pasta existente no projeto
+TODO: Describe the contents of each file and folder in the project.
 
-# Informações sobre as amostras
+# Sample Information
 
-TODO: Descrever caracteristicas especificas das amostras ou detalhes a serem considerados futuramente.
+TODO: Describe specific sample characteristics or details to be considered in the future.
